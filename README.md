@@ -37,5 +37,5 @@ build and run the `gcrom` file.
 
 ## License
 
-This projects is licensed under Zlib license.
+This project is licensed under Zlib license.
 
