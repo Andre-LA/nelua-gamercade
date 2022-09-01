@@ -18,16 +18,21 @@ You'll need a C compiler that generates an `.wasm` binary, for that, you should 
 
 ## Usage
 
-Compile your nelua source code using `CC` variable as the C compiler:
+To use the bindings, just require the `gamercade.nelua` file using `require "gamercade"` **at the beggining of the main file**.
+
+Later, apply the `update` and `draw` functions using `setup_gamercade_callbacks` function.
+
+> It's recommended to read the [pong example](examples/pong.nelua).
+
+To compile your nelua source code, just change the C compiler to the `CC` variable:
 
 ```sh
-# use nelua --help to get a better understanding about these flags:
 $ nelua examples/pong.nelua -r --cc "$CC" -o build/pong.wasm
 ```
 
 > --cc changes the C compiler, -r makes a release build (optional, but recommended), you propably want to use -o in order to make the wasm file easily accessible.
 
-Then, follow [Gamercade's guide](https://github.com/gamercade-io/gamercade_console/#bundling-a-game-with-the-editor---how-to-create-a-gcrom-file) in order to
+Finally, follow [Gamercade's guide](https://github.com/gamercade-io/gamercade_console/#bundling-a-game-with-the-editor---how-to-create-a-gcrom-file) in order to
 build and run the `gcrom` file.
 
 ## License
