@@ -1,0 +1,174 @@
+-- direct port of the gamercade's pong example:
+-- https://github.com/gamercade-io/gc_pong/blob/main/src/lib.rs
+
+-- Disable GC
+## pragmas.nogc = true
+
+require 'gamercade'
+
+local math = require 'math'
+
+local SCREEN_WIDTH <comptime>, SCREEN_HEIGHT <comptime> = 320, 180
+
+local Paddle = @record{
+  x: number,
+  y: number,
+}
+
+local Paddle.WIDTH <comptime> = 6
+local Paddle.HEIGHT <comptime> = 32
+local Paddle.START_Y: number <comptime> = (SCREEN_HEIGHT / 2) - Paddle.HEIGHT
+local Paddle.SPEED <comptime> = 1.0
+
+function Paddle.init(x: number): Paddle
+  return Paddle{
+    =x,
+    y = Paddle.START_Y
+  }
+end
+
+local Ball = @record{
+  x: number,
+  y: number,
+  x_vel: number,
+  y_vel: number,
+}
+local Ball.RADIUS <comptime> = 4
+local Ball.SPEED <comptime> = 0.75
+
+function Ball.init(): Ball
+  return Ball{
+    x = (SCREEN_WIDTH / 2),
+    y = (SCREEN_HEIGHT / 2),
+    x_vel = Ball.SPEED,
+    y_vel = Ball.SPEED,
+  }
+end
+
+local function intersects(ball: *Ball, paddle: *Paddle): boolean
+  local closest_x, closest_y = math.clamp(ball.x, paddle.x, paddle.x + Paddle.WIDTH),
+                               math.clamp(ball.y, paddle.y, paddle.y + Paddle.HEIGHT)
+
+  local distance_x = ball.x - closest_x
+  local distance_y = ball.y - closest_y
+
+  local distance_squared = distance_x * distance_x + distance_y * distance_y
+  return distance_squared < (Ball.RADIUS * Ball.RADIUS)
+end
+
+local GameState = @record{
+  paddles: [2]Paddle,
+  ball: Ball,
+  ball_color: integer,
+  paddle_color: [2]integer
+}
+
+local game_state: GameState = {
+  paddles = {
+    Paddle.init(10.0),
+    Paddle.init( (SCREEN_WIDTH - (10 + Paddle.WIDTH)) )
+  },
+  ball = Ball.init(),
+  ball_color = 0,
+  paddle_color = { 0, 0 },
+}
+
+game_state.ball_color = color_index(43)
+game_state.paddle_color[0] = color_index(31)
+game_state.paddle_color[1] = color_index(15)
+
+local function update()
+  local ball = &game_state.ball
+  local player_1 = &game_state.paddles[0]
+  local player_2 = &game_state.paddles[1]
+
+  -- physics simulation
+  ball.x = ball.x + ball.x_vel
+  ball.y = ball.y + ball.y_vel
+
+  if ball.x + Ball.RADIUS > SCREEN_WIDTH then
+    $ball = Ball.init()
+    ball.x_vel = ball.x_vel * -1.0
+  end
+
+  if ball.x - Ball.RADIUS < 0 then
+    $ball = Ball.init()
+  end
+
+  if ball.y - (Ball.RADIUS + 1) < 0 or ball.y + Ball.RADIUS > SCREEN_HEIGHT - 1 then
+    ball.y_vel = ball.y_vel * -1.0
+  end
+
+  if ball.x_vel < 0.0 then
+    if intersects(ball, player_1) then
+      ball.x_vel = ball.x_vel * -1.0
+    end
+  else
+    if intersects(ball, player_2) then
+      ball.x_vel = ball.x_vel * -1.0
+    end
+  end
+
+  -- handle inputs
+  if button_up_held(0) == 1 then
+    player_1.y = player_1.y - Paddle.SPEED
+  end
+
+  if button_down_held(0) == 1 then
+    player_1.y = player_1.y + Paddle.SPEED
+  end
+
+  if num_players() == 2 then
+    -- handle player input
+    if button_up_held(1) == 1 then
+      player_2.y = player_2.y - Paddle.SPEED
+    end
+
+    if button_down_held(1) == 1 then
+      player_2.y = player_2.y + Paddle.SPEED
+    end
+  else
+    -- be an AI
+    if player_2.y > ball.y then
+      player_2.y = player_2.y - Paddle.SPEED
+    elseif player_2.y + Paddle.HEIGHT < ball.y then
+      player_2.y = player_2.y + Paddle.SPEED
+    end
+  end
+
+  player_1.y = math.clamp(player_1.y, 0, (SCREEN_HEIGHT - Paddle.HEIGHT))
+  player_2.y = math.clamp(player_2.y, 0, (SCREEN_HEIGHT - Paddle.HEIGHT))
+end
+
+local function draw()
+  local ball = &game_state.ball
+  local player_1 = &game_state.paddles[0]
+  local player_2 = &game_state.paddles[1]
+
+  clear_screen(0)
+
+  circle(
+    game_state.ball_color,
+    math.itrunc(ball.x),
+    math.itrunc(ball.y),
+    Ball.RADIUS
+  )
+
+  rect_filled(
+    game_state.paddle_color[0],
+    math.itrunc(player_1.x),
+    math.itrunc(player_1.y),
+    Paddle.WIDTH,
+    Paddle.HEIGHT
+  )
+  rect_filled(
+    game_state.paddle_color[1],
+    math.itrunc(player_2.x),
+    math.itrunc(player_2.y),
+    Paddle.WIDTH,
+    Paddle.HEIGHT
+  )
+end
+
+setup_gamercade_callbacks!(update, draw)
+
