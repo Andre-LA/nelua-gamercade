@@ -1,3 +1,8 @@
+-- Copyright (c) 2022 André Luiz Alvares
+-- nelua-gamercade is licensed under the Zlib license.
+-- Please refer to the LICENSE file for details
+-- SPDX-License-Identifier: Zlib
+
 -- setup:
 ##[[
 -- Credits note: this code was heavily inspired by wasm4 setup code:
@@ -24,7 +29,9 @@ context.rootpragmas.writestderr = "hooked"
 context.rootpragmas.abort = "trap"
 ]]
 
-## function setup_gamercade_callbacks(update, draw)
+local gamercade = @record{}
+
+## function gamercade.value.setup_gamercade_callbacks(update, draw)
   ## static_assert(update, 'please pass the `update` function!')
   ## static_assert(draw, 'please pass the `draw` function!')
 
@@ -56,109 +63,138 @@ context.rootpragmas.abort = "trap"
 ## end
 
 -- Audio: https://gamercade.io/docs/api-reference/audio
-global function play_bgm(bgm_index: int32) <cimport, cattribute'import_name("play_bgm")'> end
-global function play_sfx(sfx_index: int32, channel: int32) <cimport, cattribute'import_name("play_sfx")'> end
-global function bgm_is_active(): int32 <cimport, cattribute'import_name("bgm_is_active")'> end
-global function channel_is_active(channel: int32): int32 <cimport, cattribute'import_name("channel_is_active")'> end
-global function stop_bgm() <cimport, cattribute'import_name("stop_bgm")'> end
-global function stop_channel(channel: int32) <cimport, cattribute'import_name("stop_channel")'> end
-global function play_note(note_id: int32, instrument_index: int32, channel: int32) <cimport, cattribute'import_name("play_note")'> end
-global function play_frequency(frequency: float32, instrument_index: int32, channel: int32) <cimport, cattribute'import_name("play_frequency")'> end
+function gamercade.play_bgm(bgm_index: int32) <cimport 'play_bgm', cattribute'import("play_bgm")'> end
+function gamercade.play_sfx(sfx_index: int32, channel: int32) <cimport 'play_sfx', cattribute'import("play_sfx")'> end
+function gamercade.stop_bgm() <cimport 'stop_bgm', cattribute'import("stop_bgm")'> end
+function gamercade.stop_channel(channel: int32) <cimport 'stop_channel', cattribute'import("stop_channel")'> end
+function gamercade.play_note(note_id: int32, instrument_index: int32, channel: int32) <cimport 'play_note', cattribute'import("play_note")'> end
+function gamercade.play_frequency(frequency: float32, instrument_index: int32, channel: int32) <cimport 'play_frequency', cattribute'import("play_frequency")'> end
+
+-- Data: https://gamercade.io/docs/api-reference/data
+function gamercade.height(): int32 <cimport 'height', cattribute'import_name("height")'> end
+function gamercade.width(): int32 <cimport 'width', cattribute'import_name("width")'> end
+function gamercade.fps(): int32 <cimport 'fps', cattribute'import_name("fps")'> end
+function gamercade.frame_time(): float32 <cimport 'frame_time', cattribute'import_name("frame_time")'> end
+function gamercade.sprite_sheet_count(): int32 <cimport 'sprite_sheet_count', cattribute'import_name("sprite_sheet_count")'> end
+function gamercade.palette_count(): int32 <cimport 'palette_count', cattribute'import_name("palette_count")'> end
+function gamercade.sprite_height(sprite_sheet: int32): int32 <cimport 'sprite_height', cattribute'import_name("sprite_height")'> end
+function gamercade.sprite_width(sprite_sheet: int32): int32 <cimport 'sprite_width', cattribute'import_name("sprite_width")'> end
+function gamercade.sprite_count(sprite_sheet: int32): int32 <cimport 'sprite_count', cattribute'import_name("sprite_count")'> end
+function gamercade.bgm_length_secs(bgm_index: int32): float32 <cimport 'bgm_length_secs', cattribute'import_name("bgm_length_secs")'> end
+function gamercade.bgm_length_frames(bgm_index: int32): int32 <cimport 'bgm_length_frames', cattribute'import_name("bgm_length_frames")'> end
+function gamercade.sfx_length_secs(sfx_index: int32): float32 <cimport 'sfx_length_secs', cattribute'import_name("sfx_length_secs")'> end
+function gamercade.sfx_length_frames(sfx_index: int32): int32 <cimport 'sfx_length_frames', cattribute'import_name("sfx_length_frames")'> end
 
 -- Graphics Parameters: https://gamercade.io/docs/api-reference/graphics-parameters
-global function palette_index(palette_index: int32): int32 <cimport, cattribute'import_name("palette_index")'> end
-global function sprite_sheet_index(sprite_sheet_index: int32): int32 <cimport, cattribute'import_name("sprite_sheet_index")'> end
-global function sprite_index(sprite_index: int32): int32 <cimport, cattribute'import_name("sprite_index")'> end
-global function color_index(color_index: int32): int32 <cimport, cattribute'import_name("color_index")'> end
-global function flip_x(flip_x: int32): int32 <cimport, cattribute'import_name("flip_x")'> end
-global function flip_y(flip_y: int32): int32 <cimport, cattribute'import_name("flip_y")'> end
-global function graphics_parameters(palette_index: int32, sprite_sheet_index: int32, sprite_index: int32, color_index: int32, flip_x: int32, flip_y: int32): int32 <cimport, cattribute'import_name("graphics_parameters")'> end
+function gamercade.palette_index(palette_index: int32): int32 <cimport 'palette_index', cattribute'import_name("palette_index")'> end
+function gamercade.sprite_sheet_index(sprite_sheet_index: int32): int32 <cimport 'sprite_sheet_index', cattribute'import_name("sprite_sheet_index")'> end
+function gamercade.sprite_index(sprite_index: int32): int32 <cimport 'sprite_index', cattribute'import_name("sprite_index")'> end
+function gamercade.color_index(color_index: int32): int32 <cimport 'color_index', cattribute'import_name("color_index")'> end
+function gamercade.flip_x(flip_x: int32): int32 <cimport 'flip_x', cattribute'import_name("flip_x")'> end
+function gamercade.flip_y(flip_y: int32): int32 <cimport 'flip_y', cattribute'import_name("flip_y")'> end
+function gamercade.graphics_parameters(palette_index: int32, sprite_sheet_index: int32, sprite_index: int32, color_index: int32, flip_x: int32, flip_y: int32): int32 <cimport 'graphics_parameters', cattribute'import_name("graphics_parameters")'> end
 
 -- Draw: https://gamercade.io/docs/api-reference/draw
-global function clear_screen(graphics_parameters: int32) <cimport, cattribute'import_name("clear_screen")'> end
-global function set_pixel(graphics_parameters: int32, x: int32, y: int32) <cimport, cattribute'import_name("set_pixel")'> end
-global function circle(graphics_parameters: int32, x: int32, y: int32, radius: int32) <cimport, cattribute'import_name("circle")'> end
-global function circle_filled(graphics_parameters: int32, x: int32, y: int32, radius: int32) <cimport, cattribute'import_name("circle_filled")'> end
-global function rect(graphics_parameters: int32, x: int32, y: int32, width: int32, height: int32) <cimport, cattribute'import_name("rect")'> end
-global function rect_filled(graphics_parameters: int32, x: int32, y: int32, width: int32, height: int32) <cimport, cattribute'import_name("rect_filled")'> end
-global function line(graphics_parameters: int32, x0: int32, y0: int32, x1: int32, y1: int32) <cimport, cattribute'import_name("line")'> end
-global function sprite(graphics_parameters: int32, transparency_mask: int64, x: int32, y: int32) <cimport, cattribute'import_name("sprite")'> end
+function gamercade.clear_screen(graphics_parameters: int32) <cimport 'clear_screen', cattribute'import_name("clear_screen")'> end
+function gamercade.set_pixel(graphics_parameters: int32, x: int32, y: int32) <cimport 'set_pixel', cattribute'import_name("set_pixel")'> end
+function gamercade.circle(graphics_parameters: int32, x: int32, y: int32, radius: int32) <cimport 'circle', cattribute'import_name("circle")'> end
+function gamercade.circle_filled(graphics_parameters: int32, x: int32, y: int32, radius: int32) <cimport 'circle_filled', cattribute'import_name("circle_filled")'> end
+function gamercade.rect(graphics_parameters: int32, x: int32, y: int32, width: int32, height: int32) <cimport 'rect', cattribute'import_name("rect")'> end
+function gamercade.rect_filled(graphics_parameters: int32, x: int32, y: int32, width: int32, height: int32) <cimport 'rect_filled', cattribute'import_name("rect_filled")'> end
+function gamercade.line(graphics_parameters: int32, x0: int32, y0: int32, x1: int32, y1: int32) <cimport 'line', cattribute'import_name("line")'> end
+function gamercade.sprite(graphics_parameters: int32, transparency_mask: int64, x: int32, y: int32) <cimport 'sprite', cattribute'import_name("sprite")'> end
 
 -- Text: https://gamercade.io/docs/api-reference/text
-global function console_log(text_ptr: pointer, len: int32) <cimport, cattribute'import_name("console_log")'> end
-global function draw_text(text_ptr: pointer, len: int32, x: int32, y: int32) <cimport, cattribute'import_name("draw_text")'> end
+function gamercade.console_log(text_ptr: cstring, len: int32) <cimport 'console_log', cattribute'import_name("console_log")'> end
+function gamercade.console_log_utf16(text_ptr: int32, len: int32) <cimport 'console_log_utf16', cattribute'import_name("console_log_utf16")'> end
 
 -- Random: https://gamercade.io/docs/api-reference/random
-global function set_seed(seed: int32) <cimport, cattribute'import_name("set_seed")'> end
-global function random_int_range(min: int32, max: int32): int32 <cimport, cattribute'import_name("random_int_range")'> end
-global function random_float(): float32 <cimport, cattribute'import_name("random_float")'> end
-global function random_float_range(min: float32, max: float32): float32 <cimport, cattribute'import_name("random_float_range")'> end
+function gamercade.set_seed(seed: int32) <cimport 'set_seed', cattribute'import_name("set_seed")'> end
+function gamercade.random_int_range(min: int32, max: int32): int32 <cimport 'random_int_range', cattribute'import_name("random_int_range")'> end
+function gamercade.random_float(): float32 <cimport 'random_float', cattribute'import_name("random_float")'> end
+function gamercade.random_float_range(min: float32, max: float32): float32 <cimport 'random_float_range', cattribute'import_name("random_float_range")'> end
 
 -- Input: https://gamercade.io/docs/api-reference/input
-global function button_a_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_a_pressed")'> end
-global function button_a_released(player_id: int32): int32 <cimport, cattribute'import_name("button_a_released")'> end
-global function button_a_held(player_id: int32): int32 <cimport, cattribute'import_name("button_a_held")'> end
-global function button_b_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_b_pressed")'> end
-global function button_b_released(player_id: int32): int32 <cimport, cattribute'import_name("button_b_released")'> end
-global function button_b_held(player_id: int32): int32 <cimport, cattribute'import_name("button_b_held")'> end
-global function button_c_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_c_pressed")'> end
-global function button_c_released(player_id: int32): int32 <cimport, cattribute'import_name("button_c_released")'> end
-global function button_c_held(player_id: int32): int32 <cimport, cattribute'import_name("button_c_held")'> end
-global function button_d_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_d_pressed")'> end
-global function button_d_released(player_id: int32): int32 <cimport, cattribute'import_name("button_d_released")'> end
-global function button_d_held(player_id: int32): int32 <cimport, cattribute'import_name("button_d_held")'> end
-global function button_up_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_up_pressed")'> end
-global function button_up_released(player_id: int32): int32 <cimport, cattribute'import_name("button_up_released")'> end
-global function button_up_held(player_id: int32): int32 <cimport, cattribute'import_name("button_up_held")'> end
-global function button_down_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_down_pressed")'> end
-global function button_down_released(player_id: int32): int32 <cimport, cattribute'import_name("button_down_released")'> end
-global function button_down_held(player_id: int32): int32 <cimport, cattribute'import_name("button_down_held")'> end
-global function button_left_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_left_pressed")'> end
-global function button_left_released(player_id: int32): int32 <cimport, cattribute'import_name("button_left_released")'> end
-global function button_left_held(player_id: int32): int32 <cimport, cattribute'import_name("button_left_held")'> end
-global function button_right_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_right_pressed")'> end
-global function button_right_released(player_id: int32): int32 <cimport, cattribute'import_name("button_right_released")'> end
-global function button_right_held(player_id: int32): int32 <cimport, cattribute'import_name("button_right_held")'> end
-global function button_start_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_start_pressed")'> end
-global function button_start_released(player_id: int32): int32 <cimport, cattribute'import_name("button_start_released")'> end
-global function button_start_held(player_id: int32): int32 <cimport, cattribute'import_name("button_start_held")'> end
-global function button_select_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_select_pressed")'> end
-global function button_select_released(player_id: int32): int32 <cimport, cattribute'import_name("button_select_released")'> end
-global function button_select_held(player_id: int32): int32 <cimport, cattribute'import_name("button_select_held")'> end
-global function button_left_shoulder_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_left_shoulder_pressed")'> end
-global function button_left_shoulder_released(player_id: int32): int32 <cimport, cattribute'import_name("button_left_shoulder_released")'> end
-global function button_left_shoulder_held(player_id: int32): int32 <cimport, cattribute'import_name("button_left_shoulder_held")'> end
-global function button_right_shoulder_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_right_shoulder_pressed")'> end
-global function button_right_shoulder_released(player_id: int32): int32 <cimport, cattribute'import_name("button_right_shoulder_released")'> end
-global function button_right_shoulder_held(player_id: int32): int32 <cimport, cattribute'import_name("button_right_shoulder_held")'> end
-global function button_left_stick_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_left_stick_pressed")'> end
-global function button_left_stick_released(player_id: int32): int32 <cimport, cattribute'import_name("button_left_stick_released")'> end
-global function button_left_stick_held(player_id: int32): int32 <cimport, cattribute'import_name("button_left_stick_held")'> end
-global function button_right_stick_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_right_stick_pressed")'> end
-global function button_right_stick_released(player_id: int32): int32 <cimport, cattribute'import_name("button_right_stick_released")'> end
-global function button_right_stick_held(player_id: int32): int32 <cimport, cattribute'import_name("button_right_stick_held")'> end
-global function button_left_trigger_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_left_trigger_pressed")'> end
-global function button_left_trigger_released(player_id: int32): int32 <cimport, cattribute'import_name("button_left_trigger_released")'> end
-global function button_left_trigger_held(player_id: int32): int32 <cimport, cattribute'import_name("button_left_trigger_held")'> end
-global function button_right_trigger_pressed(player_id: int32): int32 <cimport, cattribute'import_name("button_right_trigger_pressed")'> end
-global function button_right_trigger_released(player_id: int32): int32 <cimport, cattribute'import_name("button_right_trigger_released")'> end
-global function button_right_trigger_held(player_id: int32): int32 <cimport, cattribute'import_name("button_right_trigger_held")'> end
-global function analog_left_x(player_id: int32): float32 <cimport, cattribute'import_name("analog_left_x")'> end
-global function analog_left_y(player_id: int32): float32 <cimport, cattribute'import_name("analog_left_y")'> end
-global function analog_right_x(player_id: int32): float32 <cimport, cattribute'import_name("analog_right_x")'> end
-global function analog_right_y(player_id: int32): float32 <cimport, cattribute'import_name("analog_right_y")'> end
-global function trigger_left(player_id: int32): float32 <cimport, cattribute'import_name("trigger_left")'> end
-global function trigger_right(player_id: int32): float32 <cimport, cattribute'import_name("trigger_right")'> end
-global function raw_input_state(played_id: int32): int64 <cimport, cattribute'import_name("raw_input_state")'> end
+function gamercade.button_a_pressed(player_id: int32): int32 <cimport 'button_a_pressed', cattribute'import_name("button_a_pressed")'> end
+function gamercade.button_a_released(player_id: int32): int32 <cimport 'button_a_released', cattribute'import_name("button_a_released")'> end
+function gamercade.button_a_held(player_id: int32): int32 <cimport 'button_a_held', cattribute'import_name("button_a_held")'> end
+function gamercade.button_b_pressed(player_id: int32): int32 <cimport 'button_b_pressed', cattribute'import_name("button_b_pressed")'> end
+function gamercade.button_b_released(player_id: int32): int32 <cimport 'button_b_released', cattribute'import_name("button_b_released")'> end
+function gamercade.button_b_held(player_id: int32): int32 <cimport 'button_b_held', cattribute'import_name("button_b_held")'> end
+function gamercade.button_c_pressed(player_id: int32): int32 <cimport 'button_c_pressed', cattribute'import_name("button_c_pressed")'> end
+function gamercade.button_c_released(player_id: int32): int32 <cimport 'button_c_released', cattribute'import_name("button_c_released")'> end
+function gamercade.button_c_held(player_id: int32): int32 <cimport 'button_c_held', cattribute'import_name("button_c_held")'> end
+function gamercade.button_d_pressed(player_id: int32): int32 <cimport 'button_d_pressed', cattribute'import_name("button_d_pressed")'> end
+function gamercade.button_d_released(player_id: int32): int32 <cimport 'button_d_released', cattribute'import_name("button_d_released")'> end
+function gamercade.button_d_held(player_id: int32): int32 <cimport 'button_d_held', cattribute'import_name("button_d_held")'> end
+function gamercade.button_up_pressed(player_id: int32): int32 <cimport 'button_up_pressed', cattribute'import_name("button_up_pressed")'> end
+function gamercade.button_up_released(player_id: int32): int32 <cimport 'button_up_released', cattribute'import_name("button_up_released")'> end
+function gamercade.button_up_held(player_id: int32): int32 <cimport 'button_up_held', cattribute'import_name("button_up_held")'> end
+function gamercade.button_down_pressed(player_id: int32): int32 <cimport 'button_down_pressed', cattribute'import_name("button_down_pressed")'> end
+function gamercade.button_down_released(player_id: int32): int32 <cimport 'button_down_released', cattribute'import_name("button_down_released")'> end
+function gamercade.button_down_held(player_id: int32): int32 <cimport 'button_down_held', cattribute'import_name("button_down_held")'> end
+function gamercade.button_left_pressed(player_id: int32): int32 <cimport 'button_left_pressed', cattribute'import_name("button_left_pressed")'> end
+function gamercade.button_left_released(player_id: int32): int32 <cimport 'button_left_released', cattribute'import_name("button_left_released")'> end
+function gamercade.button_left_held(player_id: int32): int32 <cimport 'button_left_held', cattribute'import_name("button_left_held")'> end
+function gamercade.button_right_pressed(player_id: int32): int32 <cimport 'button_right_pressed', cattribute'import_name("button_right_pressed")'> end
+function gamercade.button_right_released(player_id: int32): int32 <cimport 'button_right_released', cattribute'import_name("button_right_released")'> end
+function gamercade.button_right_held(player_id: int32): int32 <cimport 'button_right_held', cattribute'import_name("button_right_held")'> end
+function gamercade.button_start_pressed(player_id: int32): int32 <cimport 'button_start_pressed', cattribute'import_name("button_start_pressed")'> end
+function gamercade.button_start_released(player_id: int32): int32 <cimport 'button_start_released', cattribute'import_name("button_start_released")'> end
+function gamercade.button_start_held(player_id: int32): int32 <cimport 'button_start_held', cattribute'import_name("button_start_held")'> end
+function gamercade.button_select_pressed(player_id: int32): int32 <cimport 'button_select_pressed', cattribute'import_name("button_select_pressed")'> end
+function gamercade.button_select_released(player_id: int32): int32 <cimport 'button_select_released', cattribute'import_name("button_select_released")'> end
+function gamercade.button_select_held(player_id: int32): int32 <cimport 'button_select_held', cattribute'import_name("button_select_held")'> end
+function gamercade.button_left_shoulder_pressed(player_id: int32): int32 <cimport 'button_left_shoulder_pressed', cattribute'import_name("button_left_shoulder_pressed")'> end
+function gamercade.button_left_shoulder_released(player_id: int32): int32 <cimport 'button_left_shoulder_released', cattribute'import_name("button_left_shoulder_released")'> end
+function gamercade.button_left_shoulder_held(player_id: int32): int32 <cimport 'button_left_shoulder_held', cattribute'import_name("button_left_shoulder_held")'> end
+function gamercade.button_right_shoulder_pressed(player_id: int32): int32 <cimport 'button_right_shoulder_pressed', cattribute'import_name("button_right_shoulder_pressed")'> end
+function gamercade.button_right_shoulder_released(player_id: int32): int32 <cimport 'button_right_shoulder_released', cattribute'import_name("button_right_shoulder_released")'> end
+function gamercade.button_right_shoulder_held(player_id: int32): int32 <cimport 'button_right_shoulder_held', cattribute'import_name("button_right_shoulder_held")'> end
+function gamercade.button_left_stick_pressed(player_id: int32): int32 <cimport 'button_left_stick_pressed', cattribute'import_name("button_left_stick_pressed")'> end
+function gamercade.button_left_stick_released(player_id: int32): int32 <cimport 'button_left_stick_released', cattribute'import_name("button_left_stick_released")'> end
+function gamercade.button_left_stick_held(player_id: int32): int32 <cimport 'button_left_stick_held', cattribute'import_name("button_left_stick_held")'> end
+function gamercade.button_right_stick_pressed(player_id: int32): int32 <cimport 'button_right_stick_pressed', cattribute'import_name("button_right_stick_pressed")'> end
+function gamercade.button_right_stick_released(player_id: int32): int32 <cimport 'button_right_stick_released', cattribute'import_name("button_right_stick_released")'> end
+function gamercade.button_right_stick_held(player_id: int32): int32 <cimport 'button_right_stick_held', cattribute'import_name("button_right_stick_held")'> end
+function gamercade.button_left_trigger_pressed(player_id: int32): int32 <cimport 'button_left_trigger_pressed', cattribute'import_name("button_left_trigger_pressed")'> end
+function gamercade.button_left_trigger_released(player_id: int32): int32 <cimport 'button_left_trigger_released', cattribute'import_name("button_left_trigger_released")'> end
+function gamercade.button_left_trigger_held(player_id: int32): int32 <cimport 'button_left_trigger_held', cattribute'import_name("button_left_trigger_held")'> end
+function gamercade.button_right_trigger_pressed(player_id: int32): int32 <cimport 'button_right_trigger_pressed', cattribute'import_name("button_right_trigger_pressed")'> end
+function gamercade.button_right_trigger_released(player_id: int32): int32 <cimport 'button_right_trigger_released', cattribute'import_name("button_right_trigger_released")'> end
+function gamercade.button_right_trigger_held(player_id: int32): int32 <cimport 'button_right_trigger_held', cattribute'import_name("button_right_trigger_held")'> end
+function gamercade.analog_left_x(player_id: int32): float32 <cimport 'analog_left_x', cattribute'import_name("analog_left_x")'> end
+function gamercade.analog_left_y(player_id: int32): float32 <cimport 'analog_left_y', cattribute'import_name("analog_left_y")'> end
+function gamercade.analog_right_x(player_id: int32): float32 <cimport 'analog_right_x', cattribute'import_name("analog_right_x")'> end
+function gamercade.analog_right_y(player_id: int32): float32 <cimport 'analog_right_y', cattribute'import_name("analog_right_y")'> end
+function gamercade.trigger_left(player_id: int32): float32 <cimport 'trigger_left', cattribute'import_name("trigger_left")'> end
+function gamercade.trigger_right(player_id: int32): float32 <cimport 'trigger_right', cattribute'import_name("trigger_right")'> end
+function gamercade.raw_input_state(played_id: int32): int64 <cimport 'raw_input_state', cattribute'import_name("raw_input_state")'> end
 
 -- Multiplayer: https://gamercade.io/docs/api-reference/multiplayer
-global function num_players(): int32 <cimport, cattribute'import_name("num_players")'> end
--- "WARNING: Using this is possible to desync clients! Make sure you know what you're doing before using these."
-global function is_local_player(player_id: int32): int32 <cimport, cattribute'import_name("is_local_player")'> end
-global function is_remote_player(player_id: int32): int32 <cimport, cattribute'import_name("is_remote_player")'> end
+function gamercade.num_players(): int32 <cimport 'num_players', cattribute'import_name("num_players")'> end
+function gamercade.is_local_player(player_id: int32): int32 <cimport 'is_local_player', cattribute'import_name("is_local_player")'> end
+function gamercade.is_remote_player(player_id: int32): int32 <cimport 'is_remote_player', cattribute'import_name("is_remote_player")'> end
 
 -- define nelua_write_stderr
 local function write_stderr(msg: cstring, len: usize, flush: boolean): void <codename "nelua_write_stderr">
-  console_log(msg, #msg)
+  gamercade.console_log(msg, #msg)
 end
 
+-- Replace global print function to write using `console_log` instead of writing to C `stdout`.
+global function print(...: varargs)
+  local stringbuilder = require 'stringbuilder'
+
+  local sb: stringbuilder <close>
+  ## for i=1,select('#', ...) do
+    ## if i > 1 then
+      sb:write('\t')
+    ## end
+    sb:write(#[select(i, ...)]#)
+  ## end
+
+  local text_view = sb:view()
+  gamercade.console_log(text_view.data, #text_view)
+end
+
+return gamercade

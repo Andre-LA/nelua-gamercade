@@ -2,10 +2,9 @@
 -- https://github.com/gamercade-io/gc_pong/blob/main/src/lib.rs
 
 -- Disable GC
-## pragmas.nogc = true
+## context.rootpragmas.nogc = true
 
-require 'gamercade'
-
+local gamercade = require 'gamercade'
 local math = require 'math'
 
 local SCREEN_WIDTH <comptime>, SCREEN_HEIGHT <comptime> = 320, 180
@@ -73,9 +72,9 @@ local game_state: GameState = {
   paddle_color = { 0, 0 },
 }
 
-game_state.ball_color = color_index(43)
-game_state.paddle_color[0] = color_index(31)
-game_state.paddle_color[1] = color_index(15)
+game_state.ball_color = gamercade.color_index(43)
+game_state.paddle_color[0] = gamercade.color_index(31)
+game_state.paddle_color[1] = gamercade.color_index(15)
 
 local function update()
   local ball = &game_state.ball
@@ -110,21 +109,21 @@ local function update()
   end
 
   -- handle inputs
-  if button_up_held(0) == 1 then
+  if gamercade.button_up_held(0) == 1 then
     player_1.y = player_1.y - Paddle.SPEED
   end
 
-  if button_down_held(0) == 1 then
+  if gamercade.button_down_held(0) == 1 then
     player_1.y = player_1.y + Paddle.SPEED
   end
 
-  if num_players() == 2 then
+  if gamercade.num_players() == 2 then
     -- handle player input
-    if button_up_held(1) == 1 then
+    if gamercade.button_up_held(1) == 1 then
       player_2.y = player_2.y - Paddle.SPEED
     end
 
-    if button_down_held(1) == 1 then
+    if gamercade.button_down_held(1) == 1 then
       player_2.y = player_2.y + Paddle.SPEED
     end
   else
@@ -145,23 +144,23 @@ local function draw()
   local player_1 = &game_state.paddles[0]
   local player_2 = &game_state.paddles[1]
 
-  clear_screen(0)
+  gamercade.clear_screen(0)
 
-  circle(
+  gamercade.circle(
     game_state.ball_color,
     math.itrunc(ball.x),
     math.itrunc(ball.y),
     Ball.RADIUS
   )
 
-  rect_filled(
+  gamercade.rect_filled(
     game_state.paddle_color[0],
     math.itrunc(player_1.x),
     math.itrunc(player_1.y),
     Paddle.WIDTH,
     Paddle.HEIGHT
   )
-  rect_filled(
+  gamercade.rect_filled(
     game_state.paddle_color[1],
     math.itrunc(player_2.x),
     math.itrunc(player_2.y),
@@ -170,5 +169,5 @@ local function draw()
   )
 end
 
-setup_gamercade_callbacks!(update, draw)
+## gamercade.value.setup_gamercade_callbacks(update, draw)
 
